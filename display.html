@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Today's Menu — Example School</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green:        #4a7c3f;
+    --green-light:  #6aaa5a;
+    --green-pale:   #e8f5e3;
+    --orange:       #e8821a;
+    --orange-light: #f5a84e;
+    --orange-pale:  #fff3e0;
+    --red:          #c0392b;
+    --blue:         #2980b9;
+    --blue-pale:    #e8f4fd;
+    --yellow:       #f1c40f;
+    --yellow-pale:  #fefde0;
+    --purple:       #8e44ad;
+    --cream:        #fef9f0;
+    --white:        #ffffff;
+    --dark:         #2c2c2c;
+    --border-w:     90px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--cream);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── FOOD BORDER ─────────────────────────────────────── */
+  .border-top, .border-bottom {
+    position: fixed;
+    left: 0; right: 0;
+    height: var(--border-w);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    overflow: hidden;
+  }
+  .border-top    { top: 0;    background: linear-gradient(135deg, var(--green) 0%, var(--green-light) 100%); }
+  .border-bottom { bottom: 0; background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 100%); }
+
+  .border-left, .border-right {
+    position: fixed;
+    top: 0; bottom: 0;
+    width: var(--border-w);
+    z-index: 99;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    overflow: hidden;
+    padding: calc(var(--border-w) + 10px) 0;
+  }
+  .border-left  { left: 0;  background: linear-gradient(180deg, var(--green-pale) 0%, #d4edda 100%); border-right: 4px solid var(--green-light); }
+  .border-right { right: 0; background: linear-gradient(180deg, var(--orange-pale) 0%, #ffe0b2 100%); border-left: 4px solid var(--orange-light); }
+
+  .food-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    animation: bounce 2.5s ease-in-out infinite;
+  }
+  .food-item:nth-child(2n) { animation-delay: 0.5s; }
+  .food-item:nth-child(3n) { animation-delay: 1s; }
+  .food-item:nth-child(4n) { animation-delay: 1.5s; }
+  .food-item:nth-child(5n) { animation-delay: 2s; }
+
+  @keyframes bounce {
+    0%,100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-6px) scale(1.05); }
+  }
+
+  .food-emoji { font-size: 2.6rem; line-height: 1; }
+  .food-label {
+    font-size: 0.55rem;
+    font-weight: 800;
+    color: var(--green);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: center;
+    max-width: 70px;
+  }
+  .border-top .food-label, .border-bottom .food-label { color: white; }
+  .border-right .food-label { color: var(--orange); }
+
+  /* ── MAIN CONTENT ──────────────────────────────────── */
+  .main {
+    margin: var(--border-w) var(--border-w);
+    padding: 20px 24px 28px;
+    min-height: calc(100vh - calc(var(--border-w) * 2));
+  }
+
+  /* ── HEADER ─────────────────────────────────────────── */
+  .header {
+    text-align: center;
+    padding: 18px 0 16px;
+    position: relative;
+  }
+
+  .school-name {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(1.4rem, 3vw, 2.2rem);
+    color: var(--green);
+    letter-spacing: 0.5px;
+  }
+
+  .menu-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    color: var(--orange);
+    line-height: 1;
+    margin: 4px 0;
+  }
+
+  .date-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--green);
+    color: white;
+    border-radius: 50px;
+    padding: 8px 22px;
+    font-size: clamp(0.85rem, 1.8vw, 1.1rem);
+    font-weight: 800;
+    margin: 8px 4px 4px;
+    letter-spacing: 0.3px;
+  }
+  .week-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--orange);
+    color: white;
+    border-radius: 50px;
+    padding: 8px 22px;
+    font-size: clamp(0.85rem, 1.8vw, 1.1rem);
+    font-weight: 800;
+    margin: 8px 4px 4px;
+  }
+
+  .header-divider {
+    height: 4px;
+    background: linear-gradient(90deg, var(--green), var(--orange), var(--yellow), var(--green));
+    border-radius: 2px;
+    margin: 14px 0 0;
+  }
+
+  /* ── DATE NAV ────────────────────────────────────────── */
+  .date-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px 0 18px;
+    flex-wrap: wrap;
+  }
+
+  .nav-btn {
+    background: white;
+    border: 3px solid var(--green);
+    color: var(--green);
+    border-radius: 50px;
+    padding: 8px 20px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .nav-btn:hover { background: var(--green); color: white; }
+
+  .nav-btn.today-btn {
+    background: var(--orange);
+    border-color: var(--orange);
+    color: white;
+  }
+  .nav-btn.today-btn:hover { opacity: 0.85; }
+
+  input[type="date"] {
+    border: 3px solid var(--green);
+    border-radius: 50px;
+    padding: 8px 16px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--dark);
+    outline: none;
+    background: white;
+  }
+
+  /* ── WEEKEND / NO MENU ───────────────────────────────── */
+  .no-menu {
+    text-align: center;
+    padding: 60px 20px;
+  }
+  .no-menu .big-emoji { font-size: 5rem; margin-bottom: 16px; }
+  .no-menu h2 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 2.2rem;
+    color: var(--green);
+    margin-bottom: 10px;
+  }
+  .no-menu p { color: #888; font-size: 1.1rem; font-weight: 600; }
+
+  /* ── MENU GRID ────────────────────────────────────────── */
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    margin-bottom: 20px;
+  }
+
+  .meal-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+    transition: transform 0.2s;
+  }
+  .meal-card:hover { transform: translateY(-3px); }
+
+  .meal-card-header {
+    padding: 14px 18px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .meal-card-header .icon { font-size: 1.8rem; }
+  .meal-card-header h3 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.25rem;
+    letter-spacing: 0.3px;
+  }
+
+  .meal-card.starter  .meal-card-header { background: var(--orange-pale); }
+  .meal-card.main     .meal-card-header { background: var(--green-pale); }
+  .meal-card.dessert  .meal-card-header { background: var(--yellow-pale); }
+  .meal-card.notes    .meal-card-header { background: var(--blue-pale); }
+
+  .meal-card.starter  h3 { color: var(--orange); }
+  .meal-card.main     h3 { color: var(--green); }
+  .meal-card.dessert  h3 { color: #c0880a; }
+  .meal-card.notes    h3 { color: var(--blue); }
+
+  .meal-card-body {
+    padding: 14px 18px 18px;
+  }
+
+  .meal-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px dashed #eee;
+    font-size: clamp(0.85rem, 1.5vw, 1rem);
+    font-weight: 700;
+    color: var(--dark);
+    line-height: 1.3;
+  }
+  .meal-option:last-child { border-bottom: none; }
+
+  .diet-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 26px;
+    height: 20px;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 900;
+    padding: 0 5px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .tag-v  { background: #c8e6c9; color: #2e7d32; }
+  .tag-vg { background: #a5d6a7; color: #1b5e20; }
+  .tag-h  { background: #bbdefb; color: #1565c0; }
+  .tag-gf { background: #fff9c4; color: #f57f17; }
+
+  .notes-text {
+    font-size: 0.9rem;
+    color: #555;
+    font-weight: 600;
+    line-height: 1.5;
+    font-style: italic;
+  }
+  .notes-text:empty::before { content: 'No additional notes.'; color: #aaa; }
+
+  /* ── LEGEND ──────────────────────────────────────────── */
+  .legend {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 6px 0 4px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #666;
+  }
+
+  /* ── HALAL NOTE ──────────────────────────────────────── */
+  .halal-note {
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--blue);
+    padding: 6px 0 14px;
+  }
+
+  /* ── REFRESH BAR ─────────────────────────────────────── */
+  .refresh-bar {
+    position: fixed;
+    bottom: calc(var(--border-w) + 8px);
+    right: calc(var(--border-w) + 12px);
+    background: rgba(255,255,255,0.9);
+    border: 2px solid var(--green);
+    border-radius: 50px;
+    padding: 5px 14px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--green);
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .refresh-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;}50%{opacity:0.3;} }
+
+  /* ── HOME LINK ───────────────────────────────────────── */
+  .home-link {
+    position: fixed;
+    bottom: calc(var(--border-w) + 8px);
+    left: calc(var(--border-w) + 12px);
+    background: var(--orange);
+    color: white;
+    border-radius: 50px;
+    padding: 7px 18px;
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 0.85rem;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: opacity 0.2s;
+  }
+  .home-link:hover { opacity: 0.85; }
+
+  /* ── RESPONSIVE ──────────────────────────────────────── */
+  @media (max-width: 700px) {
+    :root { --border-w: 55px; }
+    .food-label { display: none; }
+    .food-emoji { font-size: 1.8rem; }
+  }
+
+  @media (max-width: 480px) {
+    :root { --border-w: 45px; }
+    .border-left, .border-right { display: none; }
+    :root { --border-w: 55px; }
+    .main { margin: 55px 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- FOOD BORDER: TOP -->
+<div class="border-top">
+  <div class="food-item"><div class="food-emoji">🍎</div><div class="food-label">Apple</div></div>
+  <div class="food-item"><div class="food-emoji">🥕</div><div class="food-label">Carrot</div></div>
+  <div class="food-item"><div class="food-emoji">🥦</div><div class="food-label">Broccoli</div></div>
+  <div class="food-item"><div class="food-emoji">🍞</div><div class="food-label">Bread</div></div>
+  <div class="food-item"><div class="food-emoji">🍋</div><div class="food-label">Lemon</div></div>
+  <div class="food-item"><div class="food-emoji">🫐</div><div class="food-label">Blueberry</div></div>
+  <div class="food-item"><div class="food-emoji">🍓</div><div class="food-label">Strawberry</div></div>
+  <div class="food-item"><div class="food-emoji">🌽</div><div class="food-label">Sweetcorn</div></div>
+  <div class="food-item"><div class="food-emoji">🍊</div><div class="food-label">Orange</div></div>
+  <div class="food-item"><div class="food-emoji">🥝</div><div class="food-label">Kiwi</div></div>
+  <div class="food-item"><div class="food-emoji">🥑</div><div class="food-label">Avocado</div></div>
+  <div class="food-item"><div class="food-emoji">🍇</div><div class="food-label">Grapes</div></div>
+  <div class="food-item"><div class="food-emoji">🥬</div><div class="food-label">Lettuce</div></div>
+  <div class="food-item"><div class="food-emoji">🍅</div><div class="food-label">Tomato</div></div>
+  <div class="food-item"><div class="food-emoji">🫛</div><div class="food-label">Peas</div></div>
+</div>
+
+<!-- FOOD BORDER: BOTTOM -->
+<div class="border-bottom">
+  <div class="food-item"><div class="food-emoji">🥐</div><div class="food-label">Croissant</div></div>
+  <div class="food-item"><div class="food-emoji">🍰</div><div class="food-label">Cake</div></div>
+  <div class="food-item"><div class="food-emoji">🥗</div><div class="food-label">Salad</div></div>
+  <div class="food-item"><div class="food-emoji">🍜</div><div class="food-label">Noodles</div></div>
+  <div class="food-item"><div class="food-emoji">🧁</div><div class="food-label">Cupcake</div></div>
+  <div class="food-item"><div class="food-emoji">🥘</div><div class="food-label">Stew</div></div>
+  <div class="food-item"><div class="food-emoji">🍱</div><div class="food-label">Lunch Box</div></div>
+  <div class="food-item"><div class="food-emoji">🍲</div><div class="food-label">Soup</div></div>
+  <div class="food-item"><div class="food-emoji">🥙</div><div class="food-label">Wrap</div></div>
+  <div class="food-item"><div class="food-emoji">🥞</div><div class="food-label">Pancakes</div></div>
+  <div class="food-item"><div class="food-emoji">🍛</div><div class="food-label">Curry</div></div>
+  <div class="food-item"><div class="food-emoji">🥧</div><div class="food-label">Pie</div></div>
+  <div class="food-item"><div class="food-emoji">🍮</div><div class="food-label">Pudding</div></div>
+  <div class="food-item"><div class="food-emoji">🥯</div><div class="food-label">Bagel</div></div>
+  <div class="food-item"><div class="food-emoji">🫕</div><div class="food-label">Hotpot</div></div>
+</div>
+
+<!-- FOOD BORDER: LEFT -->
+<div class="border-left">
+  <div class="food-item"><div class="food-emoji">🍎</div><div class="food-label">Apple</div></div>
+  <div class="food-item"><div class="food-emoji">🥕</div><div class="food-label">Carrot</div></div>
+  <div class="food-item"><div class="food-emoji">🍓</div><div class="food-label">Strawberry</div></div>
+  <div class="food-item"><div class="food-emoji">🥦</div><div class="food-label">Broccoli</div></div>
+  <div class="food-item"><div class="food-emoji">🌽</div><div class="food-label">Sweetcorn</div></div>
+  <div class="food-item"><div class="food-emoji">🫐</div><div class="food-label">Blueberry</div></div>
+  <div class="food-item"><div class="food-emoji">🥬</div><div class="food-label">Lettuce</div></div>
+  <div class="food-item"><div class="food-emoji">🍋</div><div class="food-label">Lemon</div></div>
+</div>
+
+<!-- FOOD BORDER: RIGHT -->
+<div class="border-right">
+  <div class="food-item"><div class="food-emoji">🥐</div><div class="food-label">Croissant</div></div>
+  <div class="food-item"><div class="food-emoji">🍞</div><div class="food-label">Bread</div></div>
+  <div class="food-item"><div class="food-emoji">🥯</div><div class="food-label">Bagel</div></div>
+  <div class="food-item"><div class="food-emoji">🧁</div><div class="food-label">Cupcake</div></div>
+  <div class="food-item"><div class="food-emoji">🍰</div><div class="food-label">Cake</div></div>
+  <div class="food-item"><div class="food-emoji">🥝</div><div class="food-label">Kiwi</div></div>
+  <div class="food-item"><div class="food-emoji">🍇</div><div class="food-label">Grapes</div></div>
+  <div class="food-item"><div class="food-emoji">🍅</div><div class="food-label">Tomato</div></div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+  <div class="header">
+    <div class="school-name">🏫 Example School</div>
+    <div class="menu-title">Today's Lunch Menu</div>
+    <div>
+      <span class="date-badge" id="dateBadge">📅 Loading…</span>
+      <span class="week-badge" id="weekBadge">📋 Week —</span>
+    </div>
+    <div class="header-divider"></div>
+  </div>
+
+  <div class="date-nav">
+    <button class="nav-btn" onclick="changeDay(-1)">← Yesterday</button>
+    <button class="nav-btn today-btn" onclick="goToday()">📅 Today</button>
+    <input type="date" id="datePicker" onchange="pickDate(this.value)">
+    <button class="nav-btn" onclick="changeDay(1)">Tomorrow →</button>
+  </div>
+
+  <div id="menuContent"></div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="diet-tag tag-v">V</span> Vegetarian</div>
+    <div class="legend-item"><span class="diet-tag tag-vg">Vg</span> Vegan</div>
+    <div class="legend-item"><span class="diet-tag tag-h">H</span> Halal Available</div>
+    <div class="legend-item"><span class="diet-tag tag-gf">GF</span> Gluten Free</div>
+  </div>
+  <div class="halal-note">★ Halal option available on all meat dishes — please speak to kitchen staff</div>
+</div>
+
+<a href="index.html" class="home-link">🏠 Home</a>
+<div class="refresh-bar"><div class="refresh-dot"></div> Auto-refreshes every 5 min</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+//  MENU DATA  (Edit via admin.html — changes saved to localStorage)
+//  Structure: menuData[week][dayIndex]  (week 1-3, dayIndex 0=Mon…4=Fri)
+// ─────────────────────────────────────────────────────────────
+const DEFAULT_MENU = {
+  1: {
+    0: { // Monday
+      hot1: "Chicken Nuggets",
+      hot1diet: "",
+      hot2: "Nacho Pasta",
+      hot2diet: "V",
+      cold1: "Bean Jacket Potato",
+      cold1diet: "Vg",
+      cold2: "Cheese Wrap",
+      cold2diet: "V",
+      dessert: "Shortbread",
+      notes: "Halal option available on all meat dishes. All meals served with salad bar and fresh bread."
+    },
+    1: { // Tuesday
+      hot1: "Pizza",
+      hot1diet: "V",
+      hot2: "Beef Burrito",
+      hot2diet: "",
+      cold1: "BBQ Melted Cheese Pasta",
+      cold1diet: "V",
+      cold2: "Tuna & Cheese Melt Panini",
+      cold2diet: "",
+      dessert: "Victoria Sponge",
+      notes: "Halal option available. Please speak to kitchen staff for allergen information."
+    },
+    2: { // Wednesday
+      hot1: "Roast Chicken",
+      hot1diet: "",
+      hot2: "Toad in the Hole",
+      hot2diet: "V",
+      cold1: "Tuna Jacket Potato",
+      cold1diet: "",
+      cold2: "Cheese Sandwich",
+      cold2diet: "V",
+      dessert: "Jelly & Ice Cream",
+      notes: "Roast dinner Wednesday! Halal chicken available on request."
+    },
+    3: { // Thursday
+      hot1: "Spaghetti Bolognese",
+      hot1diet: "",
+      hot2: "Veggie Burger",
+      hot2diet: "Vg",
+      cold1: "Cheesy Bean Jacket",
+      cold1diet: "V",
+      cold2: "Sausage Roll",
+      cold2diet: "Vg",
+      dessert: "Crumble Sponge & Custard",
+      notes: "Halal option available. Nut-free kitchen."
+    },
+    4: { // Friday
+      hot1: "Battered Fish",
+      hot1diet: "",
+      hot2: "Cheese & Bean Quesadilla",
+      hot2diet: "V",
+      cold1: "Tuna Mayo Pasta",
+      cold1diet: "",
+      cold2: "Cheese Wrap",
+      cold2diet: "V",
+      dessert: "Brownie",
+      notes: "Fish Friday! Halal option available. Contains gluten."
+    }
+  },
+  2: {
+    0: {
+      hot1: "All Day Breakfast",
+      hot1diet: "",
+      hot2: "Mac & Cheese",
+      hot2diet: "V",
+      cold1: "Bean Jacket Potato",
+      cold1diet: "Vg",
+      cold2: "Sausage Roll",
+      cold2diet: "Vg",
+      dessert: "Oaty Cookie",
+      notes: "Halal option available. Contains dairy, gluten, eggs."
+    },
+    1: {
+      hot1: "Pizza",
+      hot1diet: "V",
+      hot2: "Crispy Salmon Strips",
+      hot2diet: "",
+      cold1: "Tasty Tomato Pasta",
+      cold1diet: "Vg",
+      cold2: "Cheese Wrap",
+      cold2diet: "V",
+      dessert: "Lemon Drizzle Bun",
+      notes: "Halal option available. Fish allergy — please inform kitchen staff."
+    },
+    2: {
+      hot1: "Roast Beef & Yorkshire Pudding",
+      hot1diet: "",
+      hot2: "Veggie Slice",
+      hot2diet: "Vg",
+      cold1: "Cheese Jacket Potato",
+      cold1diet: "V",
+      cold2: "Tuna Mayo in a Bread Bun",
+      cold2diet: "",
+      dessert: "Fruit & Ice Cream",
+      notes: "Roast dinner Wednesday! Halal beef available on request."
+    },
+    3: {
+      hot1: "Chicken Korma & Rice",
+      hot1diet: "",
+      hot2: "Sausage, Mash & Gravy",
+      hot2diet: "Vg",
+      cold1: "Tuna Mayo Jacket Potato",
+      cold1diet: "",
+      cold2: "Sausage Roll",
+      cold2diet: "Vg",
+      dessert: "Fruity Flapjack",
+      notes: "Halal chicken korma available. Contains oats, gluten."
+    },
+    4: {
+      hot1: "Fish Fingers",
+      hot1diet: "",
+      hot2: "Quiche",
+      hot2diet: "V",
+      cold1: "Cheesy Pasta",
+      cold1diet: "V",
+      cold2: "Cheese Panini",
+      cold2diet: "V",
+      dessert: "Doughnut Muffin",
+      notes: "Fish Friday! Contains gluten, dairy, eggs."
+    }
+  },
+  3: {
+    0: {
+      hot1: "Chicken Katsu & Rice",
+      hot1diet: "",
+      hot2: "Sausage Roll with Baked Beans",
+      hot2diet: "Vg",
+      cold1: "Cheese Jacket Potato",
+      cold1diet: "V",
+      cold2: "Tuna Wrap",
+      cold2diet: "",
+      dessert: "Chocolate Cookie",
+      notes: "Halal chicken available. Contains gluten, dairy."
+    },
+    1: {
+      hot1: "Pizza",
+      hot1diet: "V",
+      hot2: "Chicken Noodles",
+      hot2diet: "",
+      cold1: "Tasty Tomato Pasta",
+      cold1diet: "Vg",
+      cold2: "Cheese Baguette",
+      cold2diet: "V",
+      dessert: "Summer Mousse Pot",
+      notes: "Halal chicken noodles available. Contains gluten, dairy."
+    },
+    2: {
+      hot1: "Roast Chicken & Yorkshire Pudding",
+      hot1diet: "",
+      hot2: "Quorn Pieces & Yorkshire Pudding",
+      hot2diet: "V",
+      cold1: "Cheesy Bean Jacket Potato",
+      cold1diet: "V",
+      cold2: "Sausage Roll",
+      cold2diet: "Vg",
+      dessert: "Jelly & Ice Cream",
+      notes: "Roast dinner Wednesday! Halal chicken available."
+    },
+    3: {
+      hot1: "Lasagne",
+      hot1diet: "",
+      hot2: "Veggie Loaded Wedges",
+      hot2diet: "V",
+      cold1: "Tuna Jacket Potato",
+      cold1diet: "",
+      cold2: "Cheese Wrap",
+      cold2diet: "V",
+      dessert: "Fruit Muffin",
+      notes: "Halal option available. Contains gluten, dairy, eggs."
+    },
+    4: {
+      hot1: "Battered Fish",
+      hot1diet: "",
+      hot2: "Sweet Potato & Lentil Curry with Rice",
+      hot2diet: "Vg",
+      cold1: "BBQ Melted Cheese Pasta",
+      cold1diet: "V",
+      cold2: "Sausage Roll",
+      cold2diet: "Vg",
+      dessert: "Chocolate Lava Cake",
+      notes: "Fish Friday! Contains gluten, dairy, fish."
+    }
+  }
+};
+
+// Cycle start: Monday 20 Jan 2025 = start of Week 1
+const CYCLE_START = new Date('2025-01-20');
+
+let currentDate = new Date();
+currentDate.setHours(0,0,0,0);
+
+function getWeekNumber(date) {
+  const d = new Date(date); d.setHours(0,0,0,0);
+  const start = new Date(CYCLE_START); start.setHours(0,0,0,0);
+  const diff = Math.floor((d - start) / (7 * 24 * 3600 * 1000));
+  return ((diff % 3) + 3) % 3 + 1;
+}
+
+function getDayOfWeek(date) {
+  // 0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri
+  const d = date.getDay(); // 0=Sun,1=Mon,...6=Sat
+  return d - 1; // Mon=0..Fri=4, Sat=5, Sun=-1
+}
+
+function formatDate(date) {
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return `${days[date.getDay()]} ${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+}
+
+function toISODate(date) {
+  return date.toISOString().split('T')[0];
+}
+
+function getMenuData() {
+  try {
+    const stored = localStorage.getItem('schoolMenuData');
+    if (stored) return JSON.parse(stored);
+  } catch(e) {}
+  return DEFAULT_MENU;
+}
+
+function dietTag(diet) {
+  if (!diet) return '';
+  const map = { 'V': 'tag-v', 'Vg': 'tag-vg', 'H': 'tag-h', 'GF': 'tag-gf' };
+  const cls = map[diet] || 'tag-v';
+  return `<span class="diet-tag ${cls}">${diet}</span>`;
+}
+
+function renderMenu() {
+  const menu = getMenuData();
+  const week = getWeekNumber(currentDate);
+  const dayIdx = getDayOfWeek(currentDate);
+  const dayNames = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
+
+  document.getElementById('dateBadge').textContent = `📅 ${formatDate(currentDate)}`;
+  document.getElementById('weekBadge').textContent = `📋 Menu Week ${week}`;
+  document.getElementById('datePicker').value = toISODate(currentDate);
+
+  const content = document.getElementById('menuContent');
+
+  // Weekend
+  if (dayIdx < 0 || dayIdx > 4) {
+    content.innerHTML = `
+      <div class="no-menu">
+        <div class="big-emoji">🌟</div>
+        <h2>No School Lunch Today!</h2>
+        <p>Enjoy your weekend — see you Monday! 🎉</p>
+      </div>`;
+    return;
+  }
+
+  const day = menu[week] && menu[week][dayIdx];
+  if (!day) {
+    content.innerHTML = `<div class="no-menu"><div class="big-emoji">🍽️</div><h2>Menu Not Set</h2><p>The kitchen team hasn't entered this day's menu yet.</p></div>`;
+    return;
+  }
+
+  content.innerHTML = `
+    <div class="menu-grid">
+      <div class="meal-card starter">
+        <div class="meal-card-header"><span class="icon">🥗</span><h3>Starters & Salad Bar</h3></div>
+        <div class="meal-card-body">
+          <div class="meal-option">${dietTag(day.hot1diet)} ${day.hot1 || '—'}</div>
+          <div class="meal-option">${dietTag(day.hot2diet)} ${day.hot2 || '—'}</div>
+          <div class="meal-option">${dietTag(day.cold1diet)} ${day.cold1 || '—'}</div>
+          <div class="meal-option">${dietTag(day.cold2diet)} ${day.cold2 || '—'}</div>
+        </div>
+      </div>
+      <div class="meal-card main">
+        <div class="meal-card-header"><span class="icon">🍽️</span><h3>Hot Mains</h3></div>
+        <div class="meal-card-body">
+          <div class="meal-option">${dietTag(day.hot1diet)} ${day.hot1 || '—'}</div>
+          <div class="meal-option">${dietTag(day.hot2diet)} ${day.hot2 || '—'}</div>
+        </div>
+      </div>
+      <div class="meal-card dessert">
+        <div class="meal-card-header"><span class="icon">🍰</span><h3>Pudding</h3></div>
+        <div class="meal-card-body">
+          <div class="meal-option">🍮 ${day.dessert || '—'}</div>
+          <div class="meal-option" style="color:#aaa;font-size:0.85rem;">Served with fresh fruit daily</div>
+        </div>
+      </div>
+      <div class="meal-card notes">
+        <div class="meal-card-header"><span class="icon">ℹ️</span><h3>Dietary Info</h3></div>
+        <div class="meal-card-body">
+          <p class="notes-text">${day.notes || ''}</p>
+        </div>
+      </div>
+    </div>`;
+}
+
+function changeDay(n) {
+  currentDate = new Date(currentDate.getTime() + n * 24 * 3600 * 1000);
+  renderMenu();
+}
+
+function goToday() {
+  currentDate = new Date(); currentDate.setHours(0,0,0,0);
+  renderMenu();
+}
+
+function pickDate(val) {
+  if (!val) return;
+  currentDate = new Date(val + 'T00:00:00');
+  renderMenu();
+}
+
+// Initial render
+renderMenu();
+
+// Auto-refresh every 5 minutes
+setInterval(() => {
+  // Re-render in case menu data changed or midnight passed
+  renderMenu();
+}, 5 * 60 * 1000);
+
+// Listen for storage changes (admin saved)
+window.addEventListener('storage', renderMenu);
+</script>
+</body>
+</html>

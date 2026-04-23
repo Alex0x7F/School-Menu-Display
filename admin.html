@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Menu Editor — Example School</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green:        #4a7c3f;
+    --green-light:  #6aaa5a;
+    --green-pale:   #e8f5e3;
+    --orange:       #e8821a;
+    --orange-light: #f5a84e;
+    --orange-pale:  #fff3e0;
+    --blue:         #2980b9;
+    --blue-pale:    #e8f4fd;
+    --cream:        #fef9f0;
+    --white:        #ffffff;
+    --dark:         #2c2c2c;
+    --mid:          #555;
+    --light:        #999;
+    --border:       #e0e0e0;
+    --shadow:       rgba(0,0,0,0.07);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: #f5f5f5;
+    color: var(--dark);
+  }
+
+  /* ── HEADER ──────────────────────────────────── */
+  .top-bar {
+    background: linear-gradient(135deg, var(--green) 0%, var(--green-light) 100%);
+    color: white;
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  }
+  .top-bar h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .top-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .top-btn {
+    background: rgba(255,255,255,0.2);
+    border: 2px solid rgba(255,255,255,0.5);
+    color: white;
+    border-radius: 50px;
+    padding: 7px 18px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .top-btn:hover { background: rgba(255,255,255,0.35); }
+  .top-btn.save-all {
+    background: var(--orange);
+    border-color: var(--orange-light);
+  }
+  .top-btn.save-all:hover { opacity: 0.9; }
+
+  /* ── SAVE TOAST ───────────────────────────────── */
+  .toast {
+    position: fixed;
+    top: 80px; right: 20px;
+    background: var(--green);
+    color: white;
+    border-radius: 12px;
+    padding: 12px 22px;
+    font-weight: 800;
+    font-size: 0.95rem;
+    z-index: 999;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    transform: translateX(200px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .toast.show { transform: translateX(0); opacity: 1; }
+
+  /* ── LOGIN SCREEN ─────────────────────────────── */
+  .login-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: var(--cream);
+  }
+  .login-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px 36px;
+    width: 360px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    text-align: center;
+  }
+  .login-card .logo { font-size: 3rem; margin-bottom: 16px; }
+  .login-card h2 {
+    font-family: 'Fredoka One', cursive;
+    color: var(--green);
+    font-size: 1.8rem;
+    margin-bottom: 6px;
+  }
+  .login-card p { color: var(--light); margin-bottom: 28px; font-weight: 600; font-size: 0.9rem; }
+
+  .form-group { margin-bottom: 16px; text-align: left; }
+  .form-group label { display: block; font-weight: 800; font-size: 0.85rem; color: var(--mid); margin-bottom: 6px; }
+  .form-group input {
+    width: 100%;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .form-group input:focus { border-color: var(--green); }
+
+  .login-btn {
+    width: 100%;
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: opacity 0.2s;
+  }
+  .login-btn:hover { opacity: 0.85; }
+  .login-error {
+    background: #fde8e8;
+    color: var(--red, #c0392b);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-top: 12px;
+    display: none;
+  }
+  .login-hint {
+    margin-top: 16px;
+    font-size: 0.78rem;
+    color: #bbb;
+    font-weight: 600;
+  }
+
+  /* ── MAIN APP ─────────────────────────────────── */
+  .app { display: none; }
+
+  /* ── WEEK TABS ────────────────────────────────── */
+  .week-tabs {
+    background: white;
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    gap: 0;
+    padding: 0 28px;
+    overflow-x: auto;
+  }
+  .week-tab {
+    padding: 14px 24px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.05rem;
+    color: var(--light);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .week-tab:hover { color: var(--green); }
+  .week-tab.active { color: var(--green); border-bottom-color: var(--green); }
+
+  /* ── CONTENT ──────────────────────────────────── */
+  .content {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 20px 60px;
+  }
+
+  .cycle-info {
+    background: var(--green-pale);
+    border: 2px solid var(--green-light);
+    border-radius: 14px;
+    padding: 14px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--green);
+  }
+  .cycle-info strong { font-size: 1rem; }
+
+  /* ── DAY CARDS ────────────────────────────────── */
+  .days-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+  }
+
+  .day-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 3px 16px var(--shadow);
+    border: 2px solid transparent;
+    transition: border-color 0.15s;
+  }
+  .day-card:focus-within { border-color: var(--green-light); }
+
+  .day-card-header {
+    background: linear-gradient(135deg, var(--green) 0%, var(--green-light) 100%);
+    color: white;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .day-card-header h3 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.15rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .day-icons { font-size: 1.2rem; }
+
+  .day-card-body { padding: 16px; }
+
+  .field-row {
+    margin-bottom: 12px;
+  }
+  .field-row label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--light);
+    margin-bottom: 5px;
+  }
+  .field-row label span { font-size: 0.9rem; margin-right: 4px; }
+
+  .field-pair {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .field-pair input[type="text"] { flex: 1; }
+
+  .field-pair select {
+    width: 70px;
+    flex-shrink: 0;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 6px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--mid);
+    outline: none;
+    background: white;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .field-pair select:focus { border-color: var(--green); }
+
+  input[type="text"], textarea {
+    width: 100%;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--dark);
+    outline: none;
+    transition: border-color 0.15s;
+    background: white;
+  }
+  input[type="text"]:focus, textarea:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(74,124,63,0.1); }
+
+  textarea {
+    resize: vertical;
+    min-height: 70px;
+    line-height: 1.5;
+  }
+
+  .section-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 12px 0;
+  }
+
+  .save-day-btn {
+    width: 100%;
+    background: var(--orange);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-top: 14px;
+    transition: opacity 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .save-day-btn:hover { opacity: 0.85; }
+  .save-day-btn.saved {
+    background: var(--green);
+  }
+
+  /* ── CYCLE CONFIG PANEL ────────────────────────── */
+  .config-panel {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 3px 16px var(--shadow);
+    margin-bottom: 28px;
+  }
+  .config-panel h2 {
+    font-family: 'Fredoka One', cursive;
+    color: var(--blue);
+    font-size: 1.3rem;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .config-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .config-row label {
+    font-weight: 800;
+    font-size: 0.9rem;
+    color: var(--mid);
+    min-width: 160px;
+  }
+  .config-row input[type="date"] {
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .config-row input[type="date"]:focus { border-color: var(--blue); }
+  .config-btn {
+    background: var(--blue);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 18px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .config-btn:hover { opacity: 0.85; }
+
+  .reset-btn {
+    background: #e53935;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 18px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .reset-btn:hover { opacity: 0.85; }
+
+  /* ── RESPONSIVE ────────────────────────────────── */
+  @media (max-width: 600px) {
+    .top-bar { padding: 12px 16px; }
+    .top-bar h1 { font-size: 1.2rem; }
+    .content { padding: 16px 12px 50px; }
+    .week-tabs { padding: 0 12px; }
+    .days-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✅ Saved!</div>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="logo">🍽️</div>
+    <h2>Menu Editor</h2>
+    <p>Example School — Kitchen Staff Login</p>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" id="loginUser" placeholder="kitchen" autocomplete="username">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="loginPass" placeholder="••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()">Sign In →</button>
+    <div class="login-error" id="loginError">Incorrect username or password.</div>
+    <p class="login-hint">Demo: kitchen / menu2026 &nbsp;|&nbsp; admin / admin2026</p>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="app" id="app">
+
+  <div class="top-bar">
+    <h1>🍽️ Menu Editor — Example School</h1>
+    <div class="top-bar-right">
+      <span id="userBadge" style="font-size:0.85rem;font-weight:800;opacity:0.85;"></span>
+      <button class="top-btn save-all" onclick="saveAll()">💾 Save All Changes</button>
+      <a href="display.html" class="top-btn" target="_blank">👁️ View Display</a>
+      <a href="index.html" class="top-btn">🏠 Home</a>
+      <button class="top-btn" onclick="doLogout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="week-tabs" id="weekTabs">
+    <div class="week-tab active" onclick="switchWeek(1,this)">📋 Week 1</div>
+    <div class="week-tab" onclick="switchWeek(2,this)">📋 Week 2</div>
+    <div class="week-tab" onclick="switchWeek(3,this)">📋 Week 3</div>
+    <div class="week-tab" onclick="switchWeek('config',this)" id="configTab">⚙️ Settings</div>
+  </div>
+
+  <div class="content">
+    <div class="cycle-info" id="cycleInfo">
+      📅 <strong id="cycleInfoText">Loading cycle info…</strong>
+    </div>
+    <div id="weekContent"></div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+//  AUTH  (demo-level — no server needed)
+// ─────────────────────────────────────────────────────────────
+const USERS = {
+  'kitchen': { pass: 'menu2026', role: 'kitchen' },
+  'admin':   { pass: 'admin2026', role: 'admin' }
+};
+
+let currentUser = null;
+let currentWeek = 1;
+
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim().toLowerCase();
+  const p = document.getElementById('loginPass').value;
+  if (USERS[u] && USERS[u].pass === p) {
+    currentUser = { name: u, role: USERS[u].role };
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('userBadge').textContent = `👤 ${u} (${USERS[u].role})`;
+    // Show/hide settings tab based on role
+    document.getElementById('configTab').style.display = USERS[u].role === 'admin' ? '' : 'none';
+    renderCycleInfo();
+    renderWeek(1);
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+}
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginError').style.display = 'none';
+}
+
+// ─────────────────────────────────────────────────────────────
+//  DATA
+// ─────────────────────────────────────────────────────────────
+const DEFAULT_MENU = {
+  1: {
+    0: { hot1:"Chicken Nuggets",hot1diet:"",hot2:"Nacho Pasta",hot2diet:"V",cold1:"Bean Jacket Potato",cold1diet:"Vg",cold2:"Cheese Wrap",cold2diet:"V",dessert:"Shortbread",notes:"Halal option available on all meat dishes. All meals served with salad bar and fresh bread." },
+    1: { hot1:"Pizza",hot1diet:"V",hot2:"Beef Burrito",hot2diet:"",cold1:"BBQ Melted Cheese Pasta",cold1diet:"V",cold2:"Tuna & Cheese Melt Panini",cold2diet:"",dessert:"Victoria Sponge",notes:"Halal option available. Please speak to kitchen staff for allergen information." },
+    2: { hot1:"Roast Chicken",hot1diet:"",hot2:"Toad in the Hole",hot2diet:"V",cold1:"Tuna Jacket Potato",cold1diet:"",cold2:"Cheese Sandwich",cold2diet:"V",dessert:"Jelly & Ice Cream",notes:"Roast dinner Wednesday! Halal chicken available on request." },
+    3: { hot1:"Spaghetti Bolognese",hot1diet:"",hot2:"Veggie Burger",hot2diet:"Vg",cold1:"Cheesy Bean Jacket",cold1diet:"V",cold2:"Sausage Roll",cold2diet:"Vg",dessert:"Crumble Sponge & Custard",notes:"Halal option available. Nut-free kitchen." },
+    4: { hot1:"Battered Fish",hot1diet:"",hot2:"Cheese & Bean Quesadilla",hot2diet:"V",cold1:"Tuna Mayo Pasta",cold1diet:"",cold2:"Cheese Wrap",cold2diet:"V",dessert:"Brownie",notes:"Fish Friday! Halal option available. Contains gluten." }
+  },
+  2: {
+    0: { hot1:"All Day Breakfast",hot1diet:"",hot2:"Mac & Cheese",hot2diet:"V",cold1:"Bean Jacket Potato",cold1diet:"Vg",cold2:"Sausage Roll",cold2diet:"Vg",dessert:"Oaty Cookie",notes:"Halal option available. Contains dairy, gluten, eggs." },
+    1: { hot1:"Pizza",hot1diet:"V",hot2:"Crispy Salmon Strips",hot2diet:"",cold1:"Tasty Tomato Pasta",cold1diet:"Vg",cold2:"Cheese Wrap",cold2diet:"V",dessert:"Lemon Drizzle Bun",notes:"Halal option available. Fish allergy — please inform kitchen staff." },
+    2: { hot1:"Roast Beef & Yorkshire Pudding",hot1diet:"",hot2:"Veggie Slice",hot2diet:"Vg",cold1:"Cheese Jacket Potato",cold1diet:"V",cold2:"Tuna Mayo in a Bread Bun",cold2diet:"",dessert:"Fruit & Ice Cream",notes:"Roast dinner Wednesday! Halal beef available on request." },
+    3: { hot1:"Chicken Korma & Rice",hot1diet:"",hot2:"Sausage, Mash & Gravy",hot2diet:"Vg",cold1:"Tuna Mayo Jacket Potato",cold1diet:"",cold2:"Sausage Roll",cold2diet:"Vg",dessert:"Fruity Flapjack",notes:"Halal chicken korma available. Contains oats, gluten." },
+    4: { hot1:"Fish Fingers",hot1diet:"",hot2:"Quiche",hot2diet:"V",cold1:"Cheesy Pasta",cold1diet:"V",cold2:"Cheese Panini",cold2diet:"V",dessert:"Doughnut Muffin",notes:"Fish Friday! Contains gluten, dairy, eggs." }
+  },
+  3: {
+    0: { hot1:"Chicken Katsu & Rice",hot1diet:"",hot2:"Sausage Roll with Baked Beans",hot2diet:"Vg",cold1:"Cheese Jacket Potato",cold1diet:"V",cold2:"Tuna Wrap",cold2diet:"",dessert:"Chocolate Cookie",notes:"Halal chicken available. Contains gluten, dairy." },
+    1: { hot1:"Pizza",hot1diet:"V",hot2:"Chicken Noodles",hot2diet:"",cold1:"Tasty Tomato Pasta",cold1diet:"Vg",cold2:"Cheese Baguette",cold2diet:"V",dessert:"Summer Mousse Pot",notes:"Halal chicken noodles available. Contains gluten, dairy." },
+    2: { hot1:"Roast Chicken & Yorkshire Pudding",hot1diet:"",hot2:"Quorn Pieces & Yorkshire Pudding",hot2diet:"V",cold1:"Cheesy Bean Jacket Potato",cold1diet:"V",cold2:"Sausage Roll",cold2diet:"Vg",dessert:"Jelly & Ice Cream",notes:"Roast dinner Wednesday! Halal chicken available." },
+    3: { hot1:"Lasagne",hot1diet:"",hot2:"Veggie Loaded Wedges",hot2diet:"V",cold1:"Tuna Jacket Potato",cold1diet:"",cold2:"Cheese Wrap",cold2diet:"V",dessert:"Fruit Muffin",notes:"Halal option available. Contains gluten, dairy, eggs." },
+    4: { hot1:"Battered Fish",hot1diet:"",hot2:"Sweet Potato & Lentil Curry with Rice",hot2diet:"Vg",cold1:"BBQ Melted Cheese Pasta",cold1diet:"V",cold2:"Sausage Roll",cold2diet:"Vg",dessert:"Chocolate Lava Cake",notes:"Fish Friday! Contains gluten, dairy, fish." }
+  }
+};
+
+const DAY_NAMES  = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
+const DAY_ICONS  = ['🌅','🌤️','☀️','🌈','🎉'];
+const CYCLE_START_KEY = 'schoolCycleStart';
+const MENU_DATA_KEY   = 'schoolMenuData';
+
+function getMenuData() {
+  try { const s = localStorage.getItem(MENU_DATA_KEY); if (s) return JSON.parse(s); } catch(e){}
+  return JSON.parse(JSON.stringify(DEFAULT_MENU));
+}
+function saveMenuData(data) {
+  localStorage.setItem(MENU_DATA_KEY, JSON.stringify(data));
+}
+function getCycleStart() {
+  return localStorage.getItem(CYCLE_START_KEY) || '2025-01-20';
+}
+function saveCycleStart(val) {
+  localStorage.setItem(CYCLE_START_KEY, val);
+}
+
+function getWeekNumber(date) {
+  const d = new Date(date); d.setHours(0,0,0,0);
+  const start = new Date(getCycleStart()); start.setHours(0,0,0,0);
+  const diff = Math.floor((d - start) / (7 * 24 * 3600 * 1000));
+  return ((diff % 3) + 3) % 3 + 1;
+}
+
+function renderCycleInfo() {
+  const today = new Date();
+  const w = getWeekNumber(today);
+  const dayIdx = today.getDay() - 1;
+  const dayName = dayIdx >= 0 && dayIdx <= 4 ? DAY_NAMES[dayIdx] : (today.getDay() === 0 ? 'Sunday' : 'Saturday');
+  const isWeekend = dayIdx < 0 || dayIdx > 4;
+  document.getElementById('cycleInfoText').textContent =
+    `Today is ${dayName} — currently on Menu Week ${w}${isWeekend ? ' (weekend — no school lunch)' : ''}. Cycle started: ${getCycleStart()}`;
+}
+
+// ─────────────────────────────────────────────────────────────
+//  RENDER WEEK
+// ─────────────────────────────────────────────────────────────
+function switchWeek(week, el) {
+  document.querySelectorAll('.week-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  currentWeek = week;
+  if (week === 'config') {
+    renderConfig();
+  } else {
+    renderCycleInfo();
+    renderWeek(week);
+  }
+}
+
+function renderWeek(week) {
+  const menu = getMenuData();
+  const content = document.getElementById('weekContent');
+  content.innerHTML = `<div class="days-grid">${DAY_NAMES.map((day, i) => {
+    const d = (menu[week] && menu[week][i]) || {};
+    return `
+    <div class="day-card" id="card-w${week}-d${i}">
+      <div class="day-card-header">
+        <h3>${DAY_ICONS[i]} ${day}</h3>
+        <span class="day-icons" style="font-size:1.4rem;">${i===2?'🍗':i===4?'🐟':'🍽️'}</span>
+      </div>
+      <div class="day-card-body">
+        <div class="field-row">
+          <label><span>🔥</span>Hot Option 1</label>
+          <div class="field-pair">
+            <input type="text" id="w${week}d${i}_hot1" value="${esc(d.hot1||'')}" placeholder="e.g. Roast Chicken" oninput="markDirty(${week},${i})">
+            <select id="w${week}d${i}_hot1diet" onchange="markDirty(${week},${i})">${dietOptions(d.hot1diet)}</select>
+          </div>
+        </div>
+        <div class="field-row">
+          <label><span>🔥</span>Hot Option 2</label>
+          <div class="field-pair">
+            <input type="text" id="w${week}d${i}_hot2" value="${esc(d.hot2||'')}" placeholder="e.g. Veggie Burger" oninput="markDirty(${week},${i})">
+            <select id="w${week}d${i}_hot2diet" onchange="markDirty(${week},${i})">${dietOptions(d.hot2diet)}</select>
+          </div>
+        </div>
+        <div class="field-row">
+          <label><span>🥗</span>Cold / Jacket Option 1</label>
+          <div class="field-pair">
+            <input type="text" id="w${week}d${i}_cold1" value="${esc(d.cold1||'')}" placeholder="e.g. Tuna Jacket Potato" oninput="markDirty(${week},${i})">
+            <select id="w${week}d${i}_cold1diet" onchange="markDirty(${week},${i})">${dietOptions(d.cold1diet)}</select>
+          </div>
+        </div>
+        <div class="field-row">
+          <label><span>🥗</span>Cold / Wrap Option 2</label>
+          <div class="field-pair">
+            <input type="text" id="w${week}d${i}_cold2" value="${esc(d.cold2||'')}" placeholder="e.g. Cheese Wrap" oninput="markDirty(${week},${i})">
+            <select id="w${week}d${i}_cold2diet" onchange="markDirty(${week},${i})">${dietOptions(d.cold2diet)}</select>
+          </div>
+        </div>
+        <div class="section-divider"></div>
+        <div class="field-row">
+          <label><span>🍰</span>Pudding / Dessert</label>
+          <input type="text" id="w${week}d${i}_dessert" value="${esc(d.dessert||'')}" placeholder="e.g. Victoria Sponge" oninput="markDirty(${week},${i})">
+        </div>
+        <div class="field-row">
+          <label><span>ℹ️</span>Dietary &amp; Allergen Notes</label>
+          <textarea id="w${week}d${i}_notes" placeholder="e.g. Contains gluten, dairy. Halal available." oninput="markDirty(${week},${i})">${esc(d.notes||'')}</textarea>
+        </div>
+        <button class="save-day-btn" id="savebtn-w${week}-d${i}" onclick="saveDay(${week},${i})">💾 Save ${day}</button>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function dietOptions(selected) {
+  const opts = [['','None'],['V','V'],['Vg','Vg'],['H','Halal'],['GF','GF']];
+  return opts.map(([v,l]) => `<option value="${v}"${selected===v?' selected':''}>${l}</option>`).join('');
+}
+
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+let dirtyDays = {};
+function markDirty(week, day) {
+  dirtyDays[`${week}-${day}`] = true;
+  const btn = document.getElementById(`savebtn-w${week}-d${day}`);
+  if (btn) { btn.textContent = '💾 Save (unsaved changes)'; btn.classList.remove('saved'); }
+}
+
+function saveDay(week, day) {
+  const menu = getMenuData();
+  if (!menu[week]) menu[week] = {};
+  const get = id => document.getElementById(`w${week}d${day}_${id}`)?.value || '';
+  menu[week][day] = {
+    hot1:     get('hot1'),
+    hot1diet: get('hot1diet'),
+    hot2:     get('hot2'),
+    hot2diet: get('hot2diet'),
+    cold1:    get('cold1'),
+    cold1diet:get('cold1diet'),
+    cold2:    get('cold2'),
+    cold2diet:get('cold2diet'),
+    dessert:  get('dessert'),
+    notes:    get('notes')
+  };
+  saveMenuData(menu);
+  delete dirtyDays[`${week}-${day}`];
+  const btn = document.getElementById(`savebtn-w${week}-d${day}`);
+  if (btn) { btn.textContent = '✅ Saved!'; btn.classList.add('saved'); setTimeout(()=>{btn.textContent=`💾 Save ${DAY_NAMES[day]}`;btn.classList.remove('saved');},2000); }
+  showToast('Saved — live on display now!');
+}
+
+function saveAll() {
+  for (let w = 1; w <= 3; w++) {
+    for (let d = 0; d <= 4; d++) {
+      if (document.getElementById(`w${w}d${d}_hot1`)) saveDay(w, d);
+    }
+  }
+  showToast('All weeks saved!');
+}
+
+// ─────────────────────────────────────────────────────────────
+//  SETTINGS (admin only)
+// ─────────────────────────────────────────────────────────────
+function renderConfig() {
+  if (currentUser?.role !== 'admin') {
+    document.getElementById('weekContent').innerHTML = '<div style="padding:40px;text-align:center;color:#888;font-weight:700;">⚠️ Admin access required for settings.</div>';
+    return;
+  }
+  document.getElementById('cycleInfo').style.display = 'none';
+  document.getElementById('weekContent').innerHTML = `
+    <div class="config-panel">
+      <h2>⚙️ Cycle Configuration</h2>
+      <div class="config-row">
+        <label>Cycle Start Date (Week 1):</label>
+        <input type="date" id="cycleStartInput" value="${getCycleStart()}">
+        <button class="config-btn" onclick="saveCycleStartDate()">Update Start Date</button>
+      </div>
+      <p style="font-size:0.85rem;color:#999;font-weight:600;margin-top:8px;">
+        Set this to a Monday. The system will automatically calculate which week of the 3-week cycle any date falls on.
+      </p>
+    </div>
+    <div class="config-panel">
+      <h2>🔄 Data Management</h2>
+      <div class="config-row">
+        <label>Reset all menus to defaults:</label>
+        <button class="reset-btn" onclick="resetMenus()">⚠️ Reset to Default Menus</button>
+      </div>
+      <p style="font-size:0.85rem;color:#999;font-weight:600;margin-top:8px;">
+        This will overwrite all custom menu entries with the original sample data.
+      </p>
+    </div>
+    <div class="config-panel">
+      <h2>📤 Export Menu Data</h2>
+      <div class="config-row">
+        <button class="config-btn" onclick="exportJSON()">📄 Export as JSON</button>
+        <span style="font-size:0.85rem;color:#999;font-weight:600;">Download all menu data as a JSON file for backup or import elsewhere.</span>
+      </div>
+    </div>`;
+}
+
+function saveCycleStartDate() {
+  const val = document.getElementById('cycleStartInput').value;
+  if (!val) return;
+  saveCycleStart(val);
+  showToast('Cycle start date updated!');
+  renderCycleInfo();
+}
+
+function resetMenus() {
+  if (!confirm('Reset all menus to the original sample data? This cannot be undone.')) return;
+  saveMenuData(JSON.parse(JSON.stringify(DEFAULT_MENU)));
+  showToast('Menus reset to defaults.');
+}
+
+function exportJSON() {
+  const data = { menuData: getMenuData(), cycleStart: getCycleStart() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'example-school-menus.json';
+  a.click();
+}
+
+// ─────────────────────────────────────────────────────────────
+//  TOAST
+// ─────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = `✅ ${msg}`;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>

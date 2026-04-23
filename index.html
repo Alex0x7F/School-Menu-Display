@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Example School — Menu System</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green:  #4a7c3f;
+    --green-light: #6aaa5a;
+    --orange: #e8821a;
+    --orange-light: #f5a84e;
+    --red:    #c0392b;
+    --blue:   #2980b9;
+    --yellow: #f1c40f;
+    --cream:  #fef9f0;
+    --dark:   #2c2c2c;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--cream);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Decorative food emoji border */
+  .food-strip {
+    position: fixed;
+    left: 0; right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    font-size: 2rem;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .food-strip.top { top: 0; padding: 6px 0; background: var(--green); }
+  .food-strip.bottom { bottom: 0; padding: 6px 0; background: var(--orange); }
+  .food-strip span { animation: wobble 3s ease-in-out infinite; }
+  .food-strip span:nth-child(2n) { animation-delay: 0.4s; }
+  .food-strip span:nth-child(3n) { animation-delay: 0.8s; }
+  .food-strip span:nth-child(4n) { animation-delay: 1.2s; }
+
+  @keyframes wobble {
+    0%,100% { transform: rotate(-5deg) scale(1); }
+    50% { transform: rotate(5deg) scale(1.1); }
+  }
+
+  .side-strip {
+    position: fixed;
+    top: 0; bottom: 0;
+    width: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    font-size: 1.8rem;
+    pointer-events: none;
+    z-index: 0;
+    padding: 60px 0;
+  }
+  .side-strip.left { left: 0; background: rgba(74,124,63,0.08); }
+  .side-strip.right { right: 0; background: rgba(232,130,26,0.08); }
+  .side-strip span { animation: sway 4s ease-in-out infinite; }
+  .side-strip span:nth-child(2n) { animation-delay: 1s; }
+  .side-strip span:nth-child(3n) { animation-delay: 2s; }
+  @keyframes sway {
+    0%,100% { transform: translateX(-3px); }
+    50% { transform: translateX(3px); }
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px 20px;
+    max-width: 680px;
+    width: 100%;
+  }
+
+  .logo-circle {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, var(--green), var(--green-light));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    margin: 0 auto 24px;
+    box-shadow: 0 8px 30px rgba(74,124,63,0.3);
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    color: var(--green);
+    line-height: 1.1;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  h1 span { color: var(--orange); }
+
+  .subtitle {
+    font-size: 1.05rem;
+    color: #666;
+    margin-bottom: 48px;
+    font-weight: 600;
+  }
+
+  .cards {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .card {
+    background: white;
+    border-radius: 20px;
+    padding: 32px 28px;
+    width: 260px;
+    text-decoration: none;
+    box-shadow: 0 6px 30px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 3px solid transparent;
+    cursor: pointer;
+    display: block;
+  }
+  .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 50px rgba(0,0,0,0.14);
+  }
+
+  .card.display { border-color: var(--green); }
+  .card.admin { border-color: var(--orange); }
+
+  .card-icon {
+    font-size: 3.2rem;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .card h2 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.4rem;
+    margin-bottom: 8px;
+  }
+  .card.display h2 { color: var(--green); }
+  .card.admin h2 { color: var(--orange); }
+
+  .card p {
+    font-size: 0.9rem;
+    color: #777;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+
+  .card .btn {
+    display: inline-block;
+    margin-top: 18px;
+    padding: 10px 22px;
+    border-radius: 50px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 0.9rem;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .card.display .btn { background: var(--green); }
+  .card.admin .btn { background: var(--orange); }
+  .card .btn:hover { opacity: 0.85; }
+
+  .week-badge {
+    display: inline-block;
+    background: var(--green);
+    color: white;
+    border-radius: 50px;
+    padding: 4px 16px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    margin-top: 32px;
+    letter-spacing: 0.5px;
+  }
+
+  footer {
+    position: fixed;
+    bottom: 45px;
+    font-size: 0.8rem;
+    color: #aaa;
+    z-index: 1;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<div class="food-strip top">
+  <span>🍎</span><span>🥕</span><span>🥦</span><span>🍞</span><span>🍋</span>
+  <span>🫐</span><span>🍓</span><span>🥑</span><span>🌽</span><span>🍊</span>
+  <span>🥝</span><span>🍇</span><span>🥬</span><span>🍅</span><span>🍑</span>
+</div>
+<div class="food-strip bottom">
+  <span>🥐</span><span>🍰</span><span>🥗</span><span>🍜</span><span>🥧</span>
+  <span>🫙</span><span>🥘</span><span>🍱</span><span>🧁</span><span>🍲</span>
+  <span>🥙</span><span>🥞</span><span>🫕</span><span>🍛</span><span>🥮</span>
+</div>
+<div class="side-strip left">
+  <span>🍎</span><span>🥕</span><span>🥦</span><span>🍋</span><span>🍓</span><span>🌽</span>
+</div>
+<div class="side-strip right">
+  <span>🥝</span><span>🍇</span><span>🥬</span><span>🥑</span><span>🍞</span><span>🍅</span>
+</div>
+
+<div class="container">
+  <div class="logo-circle">🍽️</div>
+  <h1>Example School<br><span>Menu System</span></h1>
+  <p class="subtitle">Three-week rotating cycle — always up to date</p>
+
+  <div class="cards">
+    <a href="display.html" class="card display">
+      <span class="card-icon">📺</span>
+      <h2>Today's Menu</h2>
+      <p>View the menu for today or any date. Perfect for screens, signage, and parents.</p>
+      <span class="btn">View Menu →</span>
+    </a>
+
+    <a href="admin.html" class="card admin">
+      <span class="card-icon">✏️</span>
+      <h2>Edit Menus</h2>
+      <p>Kitchen manager login to update meals across the three-week cycle.</p>
+      <span class="btn">Edit Menus →</span>
+    </a>
+  </div>
+
+  <div id="weekBadge" class="week-badge">Loading…</div>
+</div>
+
+<footer>Example School Menu System &copy; 2026</footer>
+
+<script>
+  // Cycle start: Monday 20 Jan 2025 = Week 1
+  const CYCLE_START = new Date('2025-01-20');
+
+  function getWeekNumber(date) {
+    const d = new Date(date);
+    d.setHours(0,0,0,0);
+    const start = new Date(CYCLE_START);
+    start.setHours(0,0,0,0);
+    const diff = Math.floor((d - start) / (7 * 24 * 3600 * 1000));
+    return ((diff % 3) + 3) % 3 + 1;
+  }
+
+  const today = new Date();
+  const w = getWeekNumber(today);
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const day = days[today.getDay()];
+  document.getElementById('weekBadge').textContent = `Today is ${day} — Cycle Week ${w}`;
+</script>
+
+</body>
+</html>
